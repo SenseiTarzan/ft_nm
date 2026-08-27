@@ -1,0 +1,29 @@
+# Objets et binaires
+*.o
+*.obj
+*.a
+*.so
+*.out
+obj/
+
+# Binaire du projet
+ft_nm
+
+# CMake
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.cmake
+
+# CLion / JetBrains
+.idea/
+
+# Editeurs
+*.swp
+*.swo
+*~
+.vscode/
+
+# Système
+.DS_Store
