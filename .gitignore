@@ -24,6 +24,7 @@ Makefile.cmake
 *.swo
 *~
 .vscode/
+build/
 
 # Système
 .DS_Store

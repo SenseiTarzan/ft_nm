@@ -2,16 +2,16 @@
 #include <string.h>
 
 static bool elf_filestream_read_header(t_elf_filestream *stream) {
-    rewind(stream->file);
+    fseek(stream->file, stream->margin_position_elf, SEEK_SET);
     if (stream->bit32) {
         return fread(&stream->header.ehdr_32, sizeof(Elf32_Ehdr), 1, stream->file) == 1;
     }
     return fread(&stream->header.ehdr, sizeof(Elf64_Ehdr), 1, stream->file) == 1;
 }
-
-t_elf_open_status elf_filestream_open(char *filename, t_elf_filestream *stream) {
+#include <unistd.h>
+t_elf_open_status elf_filestream_open(char *filename, t_elf_filestream *stream, FILE *file) {
     stream->filename = filename;
-    stream->file = fopen(filename, "rb");
+    stream->file = file;
     if (!stream->file) {
         return ELF_OPEN_NOT_FOUND;
     }
@@ -27,7 +27,26 @@ t_elf_open_status elf_filestream_open(char *filename, t_elf_filestream *stream) 
         stream->file = nullptr;
         return ELF_OPEN_BAD_FORMAT;
     }
-    rewind(stream->file);
+    return ELF_OPEN_OK;
+}
+t_elf_open_status elf_filestream_open_without_filename(t_elf_filestream *stream, FILE *file) {
+    stream->filename = nullptr;
+    stream->file = file;
+    if (!stream->file) {
+        return ELF_OPEN_NOT_FOUND;
+    }
+    unsigned char e_ident[6];
+    if (fread(e_ident, 1, 6, stream->file) != 6 || memcmp(e_ident, ELFMAG, SELFMAG) != 0) {
+        fclose(stream->file);
+        stream->file = nullptr;
+        return ELF_OPEN_BAD_FORMAT;
+    }
+    stream->bit32 = (e_ident[4] == ELFCLASS32);
+    if (!elf_filestream_read_header(stream)) {
+        fclose(stream->file);
+        stream->file = nullptr;
+        return ELF_OPEN_BAD_FORMAT;
+    }
     return ELF_OPEN_OK;
 }
 
@@ -68,7 +87,7 @@ bool elf_filestream_get_section_with_filter(elf_section *result, t_elf_filestrea
 bool elf_filestream_get_symbol(elf_sym *result, t_elf_filestream *stream, elf_section *symtab, unsigned int index) {
     elf_sym sym = {0};
     size_t sym_size = stream->bit32 ? sizeof(Elf32_Sym) : sizeof(Elf64_Sym);
-    if (fseek(stream->file, ELF_SEC_SH_OFFSET_PTR(symtab) + (long)(sym_size * index), SEEK_SET) != 0) {
+    if (fseek(stream->file,  (long)(stream->margin_position_elf + ELF_SEC_SH_OFFSET_PTR(symtab) + (sym_size * index)), SEEK_SET) != 0) {
         return false;
     }
     if (stream->bit32) {
@@ -88,7 +107,7 @@ bool elf_filestream_get_symbol(elf_sym *result, t_elf_filestream *stream, elf_se
 
 bool elf_filestream_has_section_beyond_eof(t_elf_filestream *stream) {
     long saved_pos = ftell(stream->file);
-    fseek(stream->file, 0, SEEK_END);
+    fseek(stream->file, stream->margin_position_elf, SEEK_END);
     long file_size = ftell(stream->file);
     fseek(stream->file, saved_pos, SEEK_SET);
 

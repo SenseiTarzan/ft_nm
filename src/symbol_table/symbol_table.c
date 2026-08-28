@@ -64,7 +64,7 @@ bool parse_elf_symbols(t_elf_filestream *stream, struct s_symbole_elf **out_symb
             continue;
         }
 
-        long name_offset = (long)ELF_SEC_SH_OFFSET(strtab_hdr) + ELF_SYM_ST_NAME(test_sym);
+        long name_offset = stream->margin_position_elf +   (long)ELF_SEC_SH_OFFSET(strtab_hdr) + ELF_SYM_ST_NAME(test_sym);
         size_t name_len = 0;
         char c;
 
@@ -139,7 +139,10 @@ bool parse_elf_symbols(t_elf_filestream *stream, struct s_symbole_elf **out_symb
     return true;
 }
 
-void free_symbols(struct s_symbole_elf *symboles, uint64_t count) {
+void free_elf_symbols(struct s_symbole_elf *symboles, uint64_t count) {
+    if (symboles == nullptr) {
+        return;
+    }
     for (uint64_t i = 0; i < count; i++) {
         free(symboles[i].name);
     }

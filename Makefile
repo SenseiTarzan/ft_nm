@@ -6,7 +6,9 @@ OBJDIR		= obj
 
 MODULES		= elf_stream \
 			  symbol_table \
-			  nm_display
+			  ar_table \
+			  nm_display \
+			  file_type
 
 SRCS		= $(SRCDIR)/main.c \
 			  $(foreach m,$(MODULES),$(SRCDIR)/$(m)/$(m).c)
@@ -14,7 +16,7 @@ OBJS		= $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 DEPS		= $(OBJS:.o=.d)
 
 IFLAGS		= -I$(SRCDIR) $(foreach m,$(MODULES),-I$(SRCDIR)/$(m))
-CFLAGS		= -Wall -Wextra -Werror -std=c23 $(IFLAGS)
+CFLAGS		= -Wall -Wextra -Werror -std=c23 $(IFLAGS) -g3
 DEPFLAGS	= -MMD -MP
 
 all: $(NAME)

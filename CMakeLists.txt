@@ -10,8 +10,10 @@ add_compile_options(-Wall -Wextra -Werror)
 include_directories(
         src
         src/elf_stream
+        src/file_type
         src/symbol_table
         src/nm_display
+        src/ar_table
 )
 
 add_executable(ft_nm
@@ -22,4 +24,6 @@ add_executable(ft_nm
         src/symbol_table/symbol_table.h
         src/nm_display/nm_display.c
         src/nm_display/nm_display.h
+        src/file_type/file_type.c
+        src/ar_table/ar_table.c
 )
