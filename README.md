@@ -9,6 +9,15 @@ Le programme lit et parse le format ELF directement (headers, sections,
 table des symboles, table des chaînes) pour afficher, pour chaque symbole :
 adresse, type (code, données, undefined, ...) et nom, comme le ferait `nm`.
 
+Les bibliothèques statiques Linux (`.a`, archives `ar`) sont également
+supportées : `ft_nm` parcourt les fichiers objets contenus dans l'archive
+et affiche les symboles de chacun, précédés du nom du fichier objet
+correspondant.
+
+Les bibliothèques dynamiques Linux (`.so`) sont également supportées,
+`ft_nm` lit leur table des symboles dynamiques (ainsi que la table des
+symboles classique si présente) comme pour un exécutable ELF.
+
 ## Structure
 
 - `src/elf_stream/` — lecture et parsing bas niveau du fichier ELF
@@ -39,6 +48,9 @@ cmake --build build
 ```
 
 Sans argument, `ft_nm` utilise `a.out` par défaut.
+
+Le fichier peut être un objet ELF, un exécutable ELF, une bibliothèque
+statique (`.a`) ou une bibliothèque dynamique (`.so`).
 
 ## Usage de l'IA
 
