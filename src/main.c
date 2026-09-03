@@ -8,7 +8,10 @@
 #include "file_type/file_type.h"
 #include "ar_table/ar_table.h"
 #include <ar.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 static void read_elf(t_elf_filestream *stream) {
     struct s_symbole_elf *symboles;
@@ -47,12 +50,25 @@ static void read_ar(FILE *file, const char *filename) {
 
 int main(int argc, char **argv) {
     setlocale(LC_COLLATE, "");
-    printf("argc %i\n", argc);
     long int index = 1;
+    int exit_code = 0;
     while (index < argc) {
         FILE* file = nullptr;
         const char* filename = argv[index];
-        printf("%s:\n", filename);
+        if (access(filename, F_OK) != 0) {
+            fprintf(stderr, "ft_nm: %s: file not exist\n", filename);
+            index++;
+            continue;
+        }
+        if (access(filename, R_OK)!= 0) {
+            fprintf(stderr, "ft_nm: %s: no permission\n", filename);
+            ++exit_code;
+            index++;
+            continue;
+        }
+        if(argc > 2) {
+            printf("%s:\n", filename);
+        }
         switch (detect_file_type(filename, &file)) {
             case FILE_TYPE_ELF: {
                 t_elf_filestream stream;
@@ -63,6 +79,7 @@ int main(int argc, char **argv) {
                         break;
                     case ELF_OPEN_BAD_FORMAT:
                         fprintf(stderr, "ft_nm: %s: file format not recognized\n", filename);
+                            ++exit_code;
                         break;
                     case ELF_OPEN_OK:
                         if (elf_filestream_has_section_beyond_eof(&stream)) {
@@ -79,6 +96,8 @@ int main(int argc, char **argv) {
                 break;
             }
             default:
+                fprintf(stderr, "ft_nm: %s: file format not recognized\n", filename);
+                ++exit_code;
                 break;
 
         }
@@ -88,6 +107,6 @@ int main(int argc, char **argv) {
         index++;
     }
 
-    return 0;
+    return exit_code;
 
 }
