@@ -52,6 +52,28 @@ Sans argument, `ft_nm` utilise `a.out` par défaut.
 Le fichier peut être un objet ELF, un exécutable ELF, une bibliothèque
 statique (`.a`) ou une bibliothèque dynamique (`.so`).
 
+## Scripts de correction / évaluation
+
+Depuis la racine du dépôt :
+
+```sh
+sh ./test/eval_nm.sh
+```
+
+ou via Makefile :
+
+```sh
+make eval
+```
+
+Le script suit les sections d’évaluation usuelles (`Preliminary`, erreurs, easy,
+less-easy, arguments multiples, objets 32/64, librairie dynamique, binaire
+universel).  
+Selon les cas, il compare soit la sortie complète (`stdout`/`stderr`/code de
+retour), soit uniquement la liste des symboles (avec ordre strict ou non).  
+Les dépendances absentes (ex: `nm`, compilateur, toolchain 32-bit, binaire
+universel) sont marquées `SKIP` au lieu de faire échouer toute l’évaluation.
+
 ## Usage de l'IA
 
 L'assistance IA sur ce projet s'est limitée à la génération des messages
