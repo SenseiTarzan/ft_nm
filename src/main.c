@@ -56,8 +56,9 @@ int main(int argc, char **argv) {
         FILE* file = nullptr;
         const char* filename = argv[index];
         if (access(filename, F_OK) != 0) {
-            fprintf(stderr, "ft_nm: %s: file not exist\n", filename);
+            fprintf(stderr, "ft_nm: '%s': No such file\n", filename);
             index++;
+            ++exit_code;
             continue;
         }
         if (access(filename, R_OK)!= 0) {
@@ -83,7 +84,7 @@ int main(int argc, char **argv) {
                         break;
                     case ELF_OPEN_OK:
                         if (elf_filestream_has_section_beyond_eof(&stream)) {
-                            fprintf(stderr, "ft_nm: attention: %s a une section qui s'étend au delà de la fin du fichier\n", filename);
+                            fprintf(stderr, "ft_nm: warning: %s has a section extending past end of file\n", filename);
                         }
                         read_elf(&stream);
                         break;
@@ -96,15 +97,17 @@ int main(int argc, char **argv) {
                 break;
             }
             default:
+                if (file != nullptr) {
+                    fclose(file);
+                }
                 fprintf(stderr, "ft_nm: %s: file format not recognized\n", filename);
                 ++exit_code;
                 break;
 
         }
-        if (file != nullptr) {
-            fclose(file);
+        if(++index < argc) {
+            printf("\n");
         }
-        index++;
     }
 
     return exit_code;

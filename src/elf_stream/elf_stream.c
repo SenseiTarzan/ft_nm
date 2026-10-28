@@ -8,6 +8,18 @@ static bool elf_filestream_read_header(t_elf_filestream *stream) {
     }
     return fread(&stream->header.ehdr, sizeof(Elf64_Ehdr), 1, stream->file) == 1;
 }
+
+static bool size_is_valid(t_elf_filestream *stream) {
+    fseek(stream->file, 0, SEEK_END);
+    long int file_size = ftell(stream->file);
+    fseek(stream->file, stream->margin_position_elf, SEEK_SET);
+
+    if (GET_E_SHOFF(stream) + (GET_E_SHNUM(stream) * GET_E_SHENTSIZE(stream)) > file_size) {
+        return false;
+    }
+    return true;
+}
+
 #include <unistd.h>
 t_elf_open_status elf_filestream_open(char *filename, t_elf_filestream *stream, FILE *file) {
     stream->filename = filename;
@@ -27,8 +39,25 @@ t_elf_open_status elf_filestream_open(char *filename, t_elf_filestream *stream, 
         stream->file = nullptr;
         return ELF_OPEN_BAD_FORMAT;
     }
+    if(!size_is_valid(stream)) {
+        printf("bfd plugin: %s: file too short\n", filename);
+        fclose(stream->file);
+        stream->file = nullptr;
+        return ELF_OPEN_BAD_FORMAT;
+    }
+    if(GET_MACHINE_SUPPORT(stream) == EM_X86_64 && stream->bit32) {
+        fclose(stream->file);
+        stream->file = nullptr;
+        return ELF_OPEN_BAD_FORMAT;
+    }
+    if(GET_MACHINE_SUPPORT(stream) == EM_386 && !stream->bit32) {
+        fclose(stream->file);
+        stream->file = nullptr;
+        return ELF_OPEN_BAD_FORMAT;
+    }
     return ELF_OPEN_OK;
 }
+
 t_elf_open_status elf_filestream_open_without_filename(t_elf_filestream *stream, FILE *file) {
     stream->filename = nullptr;
     stream->file = file;

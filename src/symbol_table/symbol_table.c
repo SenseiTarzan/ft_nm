@@ -81,7 +81,7 @@ bool parse_elf_symbols(t_elf_filestream *stream, struct s_symbole_elf **out_symb
             if (!name) {
                 continue;
             }
-            fprintf(stderr, "ft_nm: %s: tentative de charger des chaînes depuis une section non-chaînes (numéro %lu)\n",
+            fprintf(stderr, "ft_nm: %s: attempt to load strings from a non-string section (number %lu)\n",
                     stream->filename, strtab_index);
         } else if (name_len == 0) {
             continue;

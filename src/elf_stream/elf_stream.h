@@ -42,6 +42,7 @@ typedef enum {
 } t_elf_open_status;
 
 #define GET_E_SHNUM(stream) ((stream)->bit32 ? (stream)->header.ehdr_32.e_shnum : (stream)->header.ehdr.e_shnum)
+#define GET_MACHINE_SUPPORT(stream) ((stream)->bit32 ? (stream)->header.ehdr_32.e_machine : (stream)->header.ehdr.e_machine)
 #define GET_E_SHOFF(stream) ((stream)->bit32 ? (long int)(stream)->header.ehdr_32.e_shoff : (long int)(stream)->header.ehdr.e_shoff)
 #define GET_E_SHENTSIZE(stream) ((stream)->bit32 ? (stream)->header.ehdr_32.e_shentsize : (stream)->header.ehdr.e_shentsize)
 #define GET_E_SHSTRNDX(stream) ((stream)->bit32 ? (stream)->header.ehdr_32.e_shstrndx : (stream)->header.ehdr.e_shstrndx)
