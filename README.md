@@ -66,11 +66,13 @@ ou via Makefile :
 make eval
 ```
 
-Le script compare `./ft_nm` à `nm` (stdout, stderr, code de retour) sur des
-cas ELF/archives valides, des entrées multiples, des fichiers invalides et des
-options courantes (`-a -g -u -r -p`).  
-Les dépendances absentes (ex: `nm`, compilateur, `ar`, toolchain 32-bit) sont
-marquées `SKIP` au lieu de faire échouer toute l’évaluation.
+Le script suit les sections d’évaluation usuelles (`Preliminary`, erreurs, easy,
+less-easy, arguments multiples, objets 32/64, librairie dynamique, binaire
+universel).  
+Selon les cas, il compare soit la sortie complète (`stdout`/`stderr`/code de
+retour), soit uniquement la liste des symboles (avec ordre strict ou non).  
+Les dépendances absentes (ex: `nm`, compilateur, toolchain 32-bit, binaire
+universel) sont marquées `SKIP` au lieu de faire échouer toute l’évaluation.
 
 ## Usage de l'IA
 
