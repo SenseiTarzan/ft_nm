@@ -42,4 +42,7 @@ fclean: clean
 re: fclean
 	$(MAKE) all
 
-.PHONY: all clean fclean re
+eval:
+	sh ./test/eval_nm.sh
+
+.PHONY: all clean fclean re eval
